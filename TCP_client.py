@@ -1,6 +1,6 @@
 import socket
 
-serverName = '127.0.0.1' # Địa chỉ IP của server
+serverName = '192.168.0.65' # Địa chỉ IP của server
 serverPort = 12000 # Cổng server
 
 clientSocket = socket.socket(socket.AF_INET,socket.SOCK_STREAM) # Tạo socket TCP

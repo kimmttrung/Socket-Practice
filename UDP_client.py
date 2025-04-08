@@ -1,6 +1,6 @@
 from socket import *
 
-serverIP = '192.168.1.8' # Địa chỉ của server (có thể là IP hoặc tên miền)
+serverIP = '192.168.0.65' # Địa chỉ của server (có thể là IP hoặc tên miền)
 serverPort = 12000 #  Cổng server đang lắng nghe
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)  # Tạo socket UDP # Tạo socket UDP

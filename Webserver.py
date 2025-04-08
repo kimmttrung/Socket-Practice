@@ -40,21 +40,36 @@ while True:
 
         # Kiểm tra file tồn tại
         if os.path.exists(filepath):
-            with open(filepath, "r", encoding="utf-8") as f:
-                outputdata = f.read()
+            # Xác định kiểu nội dung dựa trên phần mở rộng
+            if filepath.endswith(".html"):
+                content_type = "text/html"
+                mode = "r"
+                encoding = "utf-8"
+            elif filepath.endswith(".jpg") or filepath.endswith(".jpeg"):
+                content_type = "image/jpeg"
+                mode = "rb"
+                encoding = None
+            elif filepath.endswith(".png"):
+                content_type = "image/png"
+                mode = "rb"
+                encoding = None
+            else:
+                content_type = "application/octet-stream"
+                mode = "rb"
+                encoding = None
 
-            # Gửi header HTTP 200 OK
-            connectionSocket.send("HTTP/1.1 200 OK\r\n".encode())
-            connectionSocket.send("Content-Type: text/html\r\n\r\n".encode())
+        with open(filepath, mode, encoding=encoding) as f:
+            outputdata = f.read()
 
-            # Gửi nội dung file
-            connectionSocket.send(outputdata.encode())
+        connectionSocket.send("HTTP/1.1 200 OK\r\n".encode())
+        connectionSocket.send(f"Content-Type: {content_type}\r\n\r\n".encode())
+
+        # Gửi dữ liệu theo dạng nhị phân hoặc chuỗi
+        if "b" in mode:
+            connectionSocket.send(outputdata)
         else:
-            # Trả về lỗi 404 nếu không tìm thấy file
-            connectionSocket.send("HTTP/1.1 404 Not Found\r\n".encode())
-            connectionSocket.send("Content-Type: text/html\r\n\r\n".encode())
-            error_message = "<html><body><h1>404 Not Found</h1><p>File không tồn tại.</p></body></html>"
-            connectionSocket.send(error_message.encode())
+            connectionSocket.send(outputdata.encode())
+
 
         if message.strip().lower() == "quit":
             print("Đang tắt server...")
