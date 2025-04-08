@@ -1,14 +1,14 @@
 import socket
 import threading
 import sys
-import time
 
-serverName = '0.0.0.0'  # localhost
-serverPort = 65432        # Port không bị chiếm
+serverName = '0.0.0.0'     # Lắng nghe tất cả địa chỉ IP
+serverPort = 65432         # Cổng kết nối server
 
-clients = {}  # lưu tên -> socket
-running = True  # trạng thái server
+clients = {}               # Lưu tên người dùng và socket tương ứng
+running = True             # Cờ kiểm soát trạng thái server
 
+# Xử lý từng client riêng
 def handle_client(conn, addr):
     try:
         conn.sendall("Nhập tên người dùng: ".encode())
@@ -22,7 +22,6 @@ def handle_client(conn, addr):
                 break
             print(f"[{name}] gửi: {msg}")
             conn.sendall(f"Đã nhận: {msg}".encode())
-
     except:
         pass
     finally:
@@ -31,6 +30,7 @@ def handle_client(conn, addr):
             del clients[name]
         print(f"[NGẮT] {name} đã rời đi")
 
+# Gửi tin nhắn từ server đến từng client, hoặc thoát server
 def send_to_client():
     global running
     while running:
@@ -39,7 +39,7 @@ def send_to_client():
             print("Đang tắt server...")
             running = False
 
-            # Đóng tất cả client
+            # Gửi thông báo và đóng kết nối với tất cả client
             for name, client in clients.items():
                 try:
                     client.sendall("Server đang đóng. Tạm biệt!".encode())
@@ -47,8 +47,7 @@ def send_to_client():
                 except:
                     pass
             clients.clear()
-            # Tự thoát luôn khỏi chương trình
-            sys.exit(0)
+            sys.exit(0)  # Thoát chương trình
         elif cmd in clients:
             msg = input(f"[NỘI DUNG] Gửi đến {cmd}: ")
             try:
@@ -58,14 +57,17 @@ def send_to_client():
         else:
             print("Không tìm thấy người dùng này.")
 
+# Hàm khởi động server
 def start_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((serverName, serverPort))
     server.listen()
     print(f"[SERVER] Đang chạy tại {serverName}:{serverPort}")
 
+    # Luồng riêng để nhập lệnh gửi hoặc tắt server
     threading.Thread(target=send_to_client, daemon=True).start()
 
+    # Lắng nghe kết nối từ client
     while running:
         try:
             conn, addr = server.accept()
@@ -73,7 +75,7 @@ def start_server():
         except:
             break
 
-    server.close()
+    server.close()  # Đóng socket server khi thoát
 
 if __name__ == "__main__":
     start_server()

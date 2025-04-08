@@ -3,7 +3,7 @@ import sys
 import os  # Để kiểm tra sự tồn tại của file
 
 # Khởi tạo socket
-serverSocket = socket(AF_INET, SOCK_STREAM)
+serverSocket = socket(AF_INET, SOCK_STREAM) # Tạo socket TCP
 
 # Thiết lập địa chỉ và cổng
 serverPort = 1200
